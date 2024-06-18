@@ -34,7 +34,7 @@ else:
     
 # FAQ HYPERPARAMETERS
 FAQ_FILE = "data/hcmut_data_faq_v3.csv"
-FAQ_THRESHOLD = 80
+FAQ_THRESHOLD = 85
 FAQ_TEMPERATURE = 0.2
 FAQ_TOP_P = 0.95
 FAQ_TOP_K = 50

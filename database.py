@@ -63,7 +63,7 @@ def initialize_db(args):
         faq_documents = []
         idx = 0
         for _, d in tqdm(faq_df.iterrows(), desc="Loading FAQ..."):
-            content = "Câu hỏi: " + d["query"]  # + " - Trả lời: " + d["answer"]
+            content = d["query"] 
             faq_documents.append(
                 Document(content=content, id=idx, meta={"answer": d["answer"]})
             )
