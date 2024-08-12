@@ -17,7 +17,7 @@ EMBEDDING_MAX_LENGTH = 256
 EMBEDDING_TOP_K = 3
 
 # LLM API ENDPOINT
-LLM_MODEL = "google/gemma-7b-it"
+LLM_MODEL = "ura-hcmut/ura-llama-2.1-8b"
 TGI_URL = "http://localhost:10025"
 API_KEY = "hf_sample_api_key"
 MAX_ANSWER_LENGTH = 4096
@@ -27,16 +27,19 @@ if "gem" in LLM_MODEL.lower():
     SEPERATORS = "<end_of_turn>\n<start_of_turn>model\n|<end_of_turn>\n<start_of_turn>user\n|<start_of_turn>user\n"
     STOP_WORDS = ["<end_of_turn>"]
 elif "mix" in LLM_MODEL.lower():
-    SEPERATORS = "\[\/INST\]|<\/s> \[INST\]|<s> \[INST\]"
+    SEPERATORS = "\\[\\/INST\\]|<\\/s> \\[INST\\]|<s> \\[INST\\]"
     STOP_WORDS = ["</s>"]
+elif "llama" in LLM_MODEL.lower():
+    SEPERATORS = "<\\|eot_id\\|>\n<\\|start_header_id\\|>assistant<\\|end_header_id\\|>\n\n|<\\|eot_id\\|>\n<\\|start_header_id\\|>user<\\|end_header_id\\|>\n\n|<\\|start_header_id\\|>user<\\|end_header_id\\|>\n\n"
+    STOP_WORDS = ["<|eot_id|>"]
 else:
     raise NotImplementedError
     
 # FAQ HYPERPARAMETERS
 FAQ_FILE = "data/hcmut_data_faq_v5.csv"
 FAQ_THRESHOLD = 85
-FAQ_TEMPERATURE = 0.2
-FAQ_TOP_P = 0.95
+FAQ_TEMPERATURE = 0.6
+FAQ_TOP_P = 0.9
 FAQ_TOP_K = 50
 FAQ_ENABLE_PARAPHRASING = False
 FAQ_QUERY_TEMPLATE = """Câu hỏi: {query}
@@ -53,6 +56,11 @@ Hãy viết lại câu trả lời theo một cách khác dùng thông tin bên 
 <end_of_turn>
 <start_of_turn>model
 Câu trả lời mới: """
+elif "llama"  in LLM_MODEL.lower():
+    FAQ_PROMPT = """<|start_header_id|>system<|end_header_id|>\n\nBạn là một trợ lý thông minh. Hãy thực hiện các yêu cầu hoặc trả lời câu hỏi từ người dùng bằng tiếng Việt.<|eot_id|>\n<|start_header_id|>user<|end_header_id|>\n\n
+Hãy viết lại câu trả lời theo một cách khác dùng thông tin bên dưới.
+{query} <|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>\n\n
+Câu trả lời mới: """
 else:
     raise NotImplementedError
 
@@ -60,8 +68,8 @@ else:
 # WEB HYPERPARAMETERS
 WEB_FILE = "data/hcmut_data_web_v3.json"
 WEB_THRESHOLD = 80
-WEB_TEMPERATURE = 0.1
-WEB_TOP_P = 0.95
+WEB_TEMPERATURE = 0.6
+WEB_TOP_P = 0.9
 WEB_TOP_K = 50
 if "mix" in LLM_MODEL.lower():
     WEB_PROMPT = """<s> [INST] Trả lời câu hỏi bằng ngữ cảnh cho sẵn.
@@ -79,6 +87,14 @@ Ngữ cảnh: '''
 Câu hỏi: {query}
 <end_of_turn>
 <start_of_turn>model
+Trả lời: """
+elif "llama" in LLM_MODEL.lower():
+    WEB_PROMPT = """<|start_header_id|>system<|end_header_id|>\n\n
+Trả lời câu hỏi bằng ngữ cảnh cho sẵn.<|eot_id|>\n<|start_header_id|>user<|end_header_id|>\n\n
+Ngữ cảnh: '''
+{join(documents, "\n")}
+'''
+Câu hỏi: {query}<|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>\n\n
 Trả lời: """
 else:
     raise NotImplementedError
