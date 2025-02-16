@@ -208,7 +208,7 @@ class ChatbotPipeline:
             warning = random.choice(WARNING_NOTES)
             fallback_ans["answers"][0].answer += f"\n\n{warning}"
             return fallback_ans
-            
+
         if FAQ_ENABLE_PARAPHRASING:
             kwargs["params"].pop("EmbeddingRetriever", None)
             if "Retriever" in kwargs["params"]:

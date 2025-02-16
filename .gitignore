@@ -163,3 +163,5 @@ __pycache__
 .ipynb_checkpoints
 data/*.csv
 data/*.json
+
+.idea
