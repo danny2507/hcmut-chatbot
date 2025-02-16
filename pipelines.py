@@ -1,8 +1,11 @@
 # SETTING UP PIPELINE
 #####################################################################################
+import os
 import re
 import random
 import logging
+import traceback
+
 from envs import *
 from haystack import Pipeline
 from haystack.schema import Answer
@@ -21,6 +24,7 @@ from haystack.nodes import (
 from invocation_layer import HFInferenceEndpointInvocationLayer
 from custom_plugins import DocumentThreshold
 from database import initialize_db
+from type_2_helpers import execute_type_2_query
 
 logger = logging.getLogger(__name__)
 
@@ -187,6 +191,22 @@ class ChatbotPipeline:
 
         kwargs["params"].update(self.faq_params)
         faq_ans = self.faq_pipeline.run(question, **kwargs)
+        # if faq found:
+        if len(faq_ans["answers"]) > 0:
+            # Detect if  type 2 was found
+            if faq_ans["documents"][0].meta.get("type") == 2:
+                func  = faq_ans["documents"][0].meta["function"]
+                params = faq_ans["documents"][0].meta["params"]
+                try:
+                    faq_ans["answers"][0].answer = execute_type_2_query(func, params)
+                except Exception as e:
+
+                    traceback.print_exc()
+                    return  {
+                        "answers": [
+                            Answer(answer="Đã xảy ra lỗi tính toán.")
+                        ],
+                    }
 
         if len(faq_ans["answers"]) == 0 or faq_ans["answers"][0].answer.strip() == "":
             kwargs["params"].update(self.web_params)
@@ -204,7 +224,9 @@ class ChatbotPipeline:
                 return llm_ans
 
             # Fallback only LLM
+
             fallback_ans = self.fallback_pipeline.run(query, **kwargs)
+
             warning = random.choice(WARNING_NOTES)
             fallback_ans["answers"][0].answer += f"\n\n{warning}"
             return fallback_ans
