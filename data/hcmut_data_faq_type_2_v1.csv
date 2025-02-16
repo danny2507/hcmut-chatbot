@@ -1,0 +1,16 @@
+﻿query,answer,type,function,params
+Có bao nhiêu giảng viên là thạc sĩ?,27,2,how_many_lecturers_is_title,ThS
+Có bao nhiêu giảng viên là tiến sĩ?,16,2,how_many_lecturers_is_title,TS
+Có bao nhiêu giảng viên là phó giáo sư?,11,2,how_many_lecturers_is_title,PGS
+Có bao nhiêu giảng viên là thạc sĩ trở lên?,54,2,how_many_lecturers_is_title_and_above,ThS
+Có bao nhiêu giảng viên là tiến sĩ trở lên?,27,2,how_many_lecturers_is_title_and_above,TS
+Có bao nhiêu giảng viên là cử nhân?,5,2,how_many_lecturers_is_title,CN
+Có bao nhiêu giảng viên là cử nhân trở lên?,62,2,how_many_lecturers_is_title_and_above,CN
+Có bao nhiêu giảng viên có bằng kỹ sư?,3,2,how_many_lecturers_is_title,KS
+Có bao nhiêu giảng viên có bằng kỹ sư trở lên?,57,2,how_many_lecturers_is_title_and_above,KS
+Có bao nhiêu giảng viên là giảng viên chính?,1,2,how_many_lecturers_is_rank,GVC
+Có bao nhiêu giảng viên là giảng viên cao cấp?,6,2,how_many_lecturers_is_rank,GVCC
+Thống kê số lượng những giảng viên có học vị trong bộ môn Công nghệ phần mềm,"Bộ môn công nghệ phần mềm (DEPARTMENT OF SOFTWARE ENGINEERING) có 3 tiến sĩ, 4 thạc sĩ, 1 cử nhân, 2 phó giáo sư ",2,list_lecturers_in_department,BỘ MÔN CÔNG NGHỆ PHẦN MỀM 
+Thống kê số lượng những giảng viên có học vị trong bộ môn kĩ thuật máy tính,"Bộ môn kĩ thuật máy tính ((DEPARTMENT OF COMPUTER ENGINEERING) có 1 tiến sĩ, 3 thạc sĩ, 2 kĩ sư, 1 cử nhân, 3 phó giáo sư",2,list_lecturers_in_department,BỘ MÔN KỸ THUẬT MÁY TÍNH
+Thống kê số lượng các giảng viên có học vị trong phòng thí nghiệm HPC LAB,"Phòng thí nghiệm HPC LAB có 1 thạc sĩ, 2 phó giáo sư ",2,list_lecturers_in_department,PTN HPC LAB
+Thống kê số lượng các giảng viên có học vị trong phòng thí nghiệm RENESAS,"Phòng thí nghiệm RENESAS có 1 tiến sĩ, 1 thạc sĩ",2,list_lecturers_in_department,PTN RENESAS

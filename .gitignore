@@ -161,5 +161,6 @@ cython_debug/
 
 __pycache__
 .ipynb_checkpoints
-data/*.csv
-data/*.json
+
+
+.idea

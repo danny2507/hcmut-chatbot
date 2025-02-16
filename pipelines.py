@@ -21,6 +21,7 @@ from haystack.nodes import (
 from invocation_layer import HFInferenceEndpointInvocationLayer
 from custom_plugins import DocumentThreshold
 from database import initialize_db
+from type_2_helpers import execute_type_2_query
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +188,13 @@ class ChatbotPipeline:
 
         kwargs["params"].update(self.faq_params)
         faq_ans = self.faq_pipeline.run(question, **kwargs)
+        # Detect if  type 2 was found
+        if faq_ans["documents"][0].meta.get("type") == 2:
+            func  = faq_ans["documents"][0].meta["function"]
+            params = faq_ans["documents"][0].meta["params"]
+            faq_ans["answers"][0].answer = execute_type_2_query(func, params)
 
+        # If there is no FAQ found
         if len(faq_ans["answers"]) == 0 or faq_ans["answers"][0].answer.strip() == "":
             kwargs["params"].update(self.web_params)
             web_ans = self.web_pipeline.run(context + "\n" + question, **kwargs)

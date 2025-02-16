@@ -2,7 +2,7 @@
 FILE_UPLOAD_PATH = "./uploaded_files"
 
 # DATABASE ENDPOINT
-QDRANTDB_URL = "http://103.176.178.107:6333"
+QDRANTDB_URL = "http://localhost:6333"
 DB_BATCH_SIZE = 256
 DB_TIMEOUT = 60
 
@@ -64,6 +64,8 @@ Câu trả lời mới: """
 else:
     raise NotImplementedError
 
+FAQ_TYPE_2_FILE = "data/hcmut_data_faq_type_2_v1.csv"
+FAQ_TYPE_2_LECTURER_DATA_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTeKuz0Zj5G2-EyuHBBenAY4AQB5jeLlDHrs5cZGgn4OmDIYZSPqj4WGG1QdH3HxQ/pub?gid=1850995197&single=true&output=csv"
 
 # WEB HYPERPARAMETERS
 WEB_FILE = "data/hcmut_data_web_v3.json"
