@@ -174,6 +174,20 @@ class ChatbotPipeline:
         return self.run(query, **kwargs)
 
     def run(self, query, **kwargs):
+        toi_khong_biet_answer =  {
+                    "answers": [
+                        Answer(answer="Tôi không biết.")
+                    ],
+                }
+        def get_llm_answer():
+            # Fallback only LLM
+            try:
+                fallback_ans = self.fallback_pipeline.run(query, **kwargs)
+            except Exception:
+                return toi_khong_biet_answer
+            warning = random.choice(WARNING_NOTES)
+            fallback_ans["answers"][0].answer += f"\n\n{warning}"
+            return fallback_ans
         llm_params = {}
         if "params" in kwargs:
             llm_params.update(kwargs["params"])
@@ -188,11 +202,16 @@ class ChatbotPipeline:
 
         kwargs["params"].update(self.faq_params)
         faq_ans = self.faq_pipeline.run(question, **kwargs)
-        # Detect if  type 2 was found
-        if faq_ans["documents"][0].meta.get("type") == 2:
-            func  = faq_ans["documents"][0].meta["function"]
-            params = faq_ans["documents"][0].meta["params"]
-            faq_ans["answers"][0].answer = execute_type_2_query(func, params)
+        # if faq found:
+        if len(faq_ans["answers"]) > 0:
+            # Detect if  type 2 was found
+            if faq_ans["documents"][0].meta.get("type") == 2:
+                func  = faq_ans["documents"][0].meta["function"]
+                params = faq_ans["documents"][0].meta["params"]
+                try:
+                    faq_ans["answers"][0].answer = execute_type_2_query(func, params)
+                except Exception as e:
+                   return get_llm_answer()
 
         # If there is no FAQ found
         if len(faq_ans["answers"]) == 0 or faq_ans["answers"][0].answer.strip() == "":
@@ -211,7 +230,10 @@ class ChatbotPipeline:
                 return llm_ans
 
             # Fallback only LLM
-            fallback_ans = self.fallback_pipeline.run(query, **kwargs)
+            try:
+                fallback_ans = self.fallback_pipeline.run(query, **kwargs)
+            except Exception:
+                return toi_khong_biet_answer
             warning = random.choice(WARNING_NOTES)
             fallback_ans["answers"][0].answer += f"\n\n{warning}"
             return fallback_ans

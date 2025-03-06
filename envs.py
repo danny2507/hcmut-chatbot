@@ -2,7 +2,7 @@
 FILE_UPLOAD_PATH = "./uploaded_files"
 
 # DATABASE ENDPOINT
-QDRANTDB_URL = "http://localhost:6333"
+QDRANTDB_URL = "http://103.176.178.107:6333"
 DB_BATCH_SIZE = 256
 DB_TIMEOUT = 60
 
