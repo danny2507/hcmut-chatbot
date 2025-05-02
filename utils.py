@@ -30,7 +30,7 @@ def get_app() -> FastAPI:
     )
 
     # Creates the router for the API calls
-    from controller import file_upload, search, feedback, document, health
+    from controller import file_upload, search, feedback, document, health, type2
 
     router = APIRouter()
     router.include_router(search.router, tags=["search"])
@@ -38,6 +38,7 @@ def get_app() -> FastAPI:
     router.include_router(file_upload.router, tags=["file-upload"])
     router.include_router(document.router, tags=["document"])
     router.include_router(health.router, tags=["health"])
+    router.include_router(type2.router, tags=["type2"])
 
     # This middleware enables allow all cross-domain requests to the API from a browser. For production
     # deployments, it could be made more restrictive.

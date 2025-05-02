@@ -12,7 +12,7 @@ import argparse
 
 class Arguments:
     def __init__(self):
-        self.reindex = False
+        self.reindex = True
         self.dev = False
 
 

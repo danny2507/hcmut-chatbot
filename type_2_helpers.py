@@ -44,7 +44,7 @@ class Type2QueryMaker:
         """
         cursor.execute(query, valid_titles)
         result = cursor.fetchone()
-        return (f"Số giảng viên có học vị {title} trở lên: {result[0]}")
+        return f"Số giảng viên có học vị {title} trở lên: {result[0]}"
     def how_many_lecturers_is_rank(self, rank):
         cursor = self.db_connection.cursor()
         query = """
@@ -95,7 +95,7 @@ def create_sqlite_db_from_csv(csv_url):
         response.raise_for_status()  # Raise an exception for bad status codes
         csv_text = response.content.decode('utf-8')
     except requests.exceptions.RequestException as e:
-        print(f"Error downloading CSV: {e}")
+        print(f"[WARNING]: FAILED TO INITIALIZE SQLITE DATABASE FOR TYPE 2 QUERIES: {e}")
         return
 
     # Read CSV data using the io.StringIO buffer
@@ -106,7 +106,7 @@ def create_sqlite_db_from_csv(csv_url):
     header = next(csv_reader)
 
     # Connect to an in-memory SQLite database
-    conn = sqlite3.connect(":memory:")
+    conn = sqlite3.connect(":memory:", check_same_thread=False)
     cursor = conn.cursor()
 
     # Create table with column names from the header
@@ -120,7 +120,7 @@ def create_sqlite_db_from_csv(csv_url):
         cursor.execute(insert_sql, row)
 
     conn.commit()
-    print("Sucessfully created SQLite database for type 2 querying.")
+    print("[+] Sucessfully created SQLite database for type 2 querying.")
 
     return conn
 
@@ -140,4 +140,4 @@ def execute_type_2_query(func_name, param):
     if func:
         return func(param)
     else:
-        print("Function not found.")
+        raise KeyError("Function not found")

@@ -1,8 +1,11 @@
 # SETTING UP PIPELINE
 #####################################################################################
+import os
 import re
 import random
 import logging
+import traceback
+
 from envs import *
 from haystack import Pipeline
 from haystack.schema import Answer
@@ -211,9 +214,14 @@ class ChatbotPipeline:
                 try:
                     faq_ans["answers"][0].answer = execute_type_2_query(func, params)
                 except Exception as e:
-                   return get_llm_answer()
 
-        # If there is no FAQ found
+                    traceback.print_exc()
+                    return  {
+                        "answers": [
+                            Answer(answer="Đã xảy ra lỗi tính toán.")
+                        ],
+                    }
+
         if len(faq_ans["answers"]) == 0 or faq_ans["answers"][0].answer.strip() == "":
             kwargs["params"].update(self.web_params)
             web_ans = self.web_pipeline.run(context + "\n" + question, **kwargs)
