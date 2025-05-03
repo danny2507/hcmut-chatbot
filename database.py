@@ -9,6 +9,8 @@ from haystack.nodes import PreProcessor
 from haystack.document_stores import InMemoryDocumentStore
 from qdrant_haystack import QdrantDocumentStore
 
+from type_2_helpers import function_map
+
 
 def initialize_db(args):
     print("[+] Initialize database...")
@@ -75,6 +77,12 @@ def initialize_db(args):
             idx += 1
         # Loading FAQ type 2
         for _, d in tqdm(faq2_df.iterrows(), desc="Loading FAQ Type 2..."):
+            function = d["function"]
+
+            # Check functions before adding
+            if function not in function_map.keys():
+                raise KeyError(f"Function {function} not found in list of supported functions: {','.join(list(function_map.keys()))}")
+
             content = d["query"]
             faq_documents.append(
                 Document(content=content, id=idx, meta={"answer": d["answer"], "type": d["type"], "function": d["function"], "params": d["params"]})

@@ -88,39 +88,67 @@ def create_sqlite_db_from_csv(csv_url):
 
     Args:
         csv_url: The URL of the CSV file.
+    Returns:
+        SQLite connection if successful, None if database creation fails
     """
+    try:
+        # First, create the database connection
+        conn = sqlite3.connect(":memory:", check_same_thread=False)
+        cursor = conn.cursor()
+    except sqlite3.Error as e:
+        print(f"[ERROR]: Failed to create SQLite database: {e}")
+        return None
+
+    def create_default_table():
+        default_schema = """
+        CREATE TABLE lecturers_data (
+            "name" TEXT,
+            "email" TEXT,
+            "department" TEXT
+        )
+        """
+        cursor.execute(default_schema)
+        conn.commit()
+        print("[+] Created empty SQLite database with default schema.")
 
     try:
+        # Attempt to download and process CSV
         response = requests.get(csv_url)
-        response.raise_for_status()  # Raise an exception for bad status codes
+        response.raise_for_status()
         csv_text = response.content.decode('utf-8')
-    except requests.exceptions.RequestException as e:
-        print(f"[WARNING]: FAILED TO INITIALIZE SQLITE DATABASE FOR TYPE 2 QUERIES: {e}")
-        return
 
-    # Read CSV data using the io.StringIO buffer
-    csv_file = io.StringIO(csv_text)
-    csv_reader = csv.reader(csv_file)
+        # Read CSV data using the io.StringIO buffer
+        csv_file = io.StringIO(csv_text)
+        csv_reader = csv.reader(csv_file)
 
-    # Get header row
-    header = next(csv_reader)
+        # Get header row
+        header = next(csv_reader)
 
-    # Connect to an in-memory SQLite database
-    conn = sqlite3.connect(":memory:", check_same_thread=False)
-    cursor = conn.cursor()
+        # Create table with column names from the header
+        columns_text = ", ".join(f'"{col}" TEXT' for col in header)
+        create_table_sql = f"CREATE TABLE lecturers_data ({columns_text})"
+        cursor.execute(create_table_sql)
 
-    # Create table with column names from the header
-    columns_text = ", ".join(f'"{col}" TEXT' for col in header)
-    create_table_sql = f"CREATE TABLE lecturers_data ({columns_text})"
-    cursor.execute(create_table_sql)
+        # Insert data into the table
+        insert_sql = f"INSERT INTO lecturers_data VALUES ({', '.join(['?'] * len(header))})"
+        for row in csv_reader:
+            cursor.execute(insert_sql, row)
 
-    # Insert data into the table
-    insert_sql = f"INSERT INTO lecturers_data VALUES ({', '.join(['?'] * len(header))})"
-    for row in csv_reader:
-        cursor.execute(insert_sql, row)
+        conn.commit()
+        print("[+] Successfully created SQLite database for type 2 querying.")
 
-    conn.commit()
-    print("[+] Sucessfully created SQLite database for type 2 querying.")
+    except (requests.exceptions.RequestException, csv.Error) as e:
+        # CSV-related errors should fall back to default table
+        print(f"[WARNING]: Failed to process CSV data: {e}")
+        try:
+            create_default_table()
+        except sqlite3.Error as e:
+            print(f"[ERROR]: Failed to create default table: {e}")
+            return None
+    except sqlite3.Error as e:
+        # SQLite-related errors should return None
+        print(f"[ERROR]: Failed to create or populate database: {e}")
+        return None
 
     return conn
 

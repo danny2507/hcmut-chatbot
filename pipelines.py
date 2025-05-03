@@ -24,7 +24,7 @@ from haystack.nodes import (
 from invocation_layer import HFInferenceEndpointInvocationLayer
 from custom_plugins import DocumentThreshold
 from database import initialize_db
-from type_2_helpers import execute_type_2_query
+from type_2_helpers import execute_type_2_query, conn
 
 logger = logging.getLogger(__name__)
 
@@ -177,6 +177,12 @@ class ChatbotPipeline:
         return self.run(query, **kwargs)
 
     def run(self, query, **kwargs):
+        def get_answer_return_object(answer_message):
+            return {
+                "answers": [
+                    Answer(answer=answer_message)
+                ],
+            }
         llm_params = {}
         if "params" in kwargs:
             llm_params.update(kwargs["params"])
@@ -197,16 +203,17 @@ class ChatbotPipeline:
             if faq_ans["documents"][0].meta.get("type") == 2:
                 func  = faq_ans["documents"][0].meta["function"]
                 params = faq_ans["documents"][0].meta["params"]
+                # Check database is live
+                if not conn:
+                    return get_answer_return_object("Cơ sở dữ liệu không hoạt động.")
                 try:
                     faq_ans["answers"][0].answer = execute_type_2_query(func, params)
+                    return faq_ans
+                except KeyError as e:
+                    return get_answer_return_object("Không tìm được hàm tính toán.")
                 except Exception as e:
-
                     traceback.print_exc()
-                    return  {
-                        "answers": [
-                            Answer(answer="Đã xảy ra lỗi tính toán.")
-                        ],
-                    }
+                    return get_answer_return_object("Đã xảy ra lỗi tính toán.")
 
         if len(faq_ans["answers"]) == 0 or faq_ans["answers"][0].answer.strip() == "":
             kwargs["params"].update(self.web_params)
