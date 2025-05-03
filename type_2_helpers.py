@@ -88,6 +88,7 @@ def create_sqlite_db_from_csv(csv_url):
 
     Args:
         csv_url: The URL of the CSV file.
+
     Returns:
         SQLite connection if successful, None if database creation fails
     """
@@ -149,6 +150,7 @@ def create_sqlite_db_from_csv(csv_url):
         # SQLite-related errors should return None
         print(f"[ERROR]: Failed to create or populate database: {e}")
         return None
+
 
     return conn
 

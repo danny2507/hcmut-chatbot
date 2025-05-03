@@ -183,6 +183,7 @@ class ChatbotPipeline:
                     Answer(answer=answer_message)
                 ],
             }
+
         llm_params = {}
         if "params" in kwargs:
             llm_params.update(kwargs["params"])
@@ -214,6 +215,7 @@ class ChatbotPipeline:
                 except Exception as e:
                     traceback.print_exc()
                     return get_answer_return_object("Đã xảy ra lỗi tính toán.")
+
 
         if len(faq_ans["answers"]) == 0 or faq_ans["answers"][0].answer.strip() == "":
             kwargs["params"].update(self.web_params)

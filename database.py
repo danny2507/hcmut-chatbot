@@ -77,11 +77,13 @@ def initialize_db(args):
             idx += 1
         # Loading FAQ type 2
         for _, d in tqdm(faq2_df.iterrows(), desc="Loading FAQ Type 2..."):
+
             function = d["function"]
 
             # Check functions before adding
             if function not in function_map.keys():
                 raise KeyError(f"Function {function} not found in list of supported functions: {','.join(list(function_map.keys()))}")
+
 
             content = d["query"]
             faq_documents.append(
